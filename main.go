@@ -13,8 +13,8 @@ import (
 var port = os.Getenv("PORT")
 
 type dataStruct struct {
-	Status string        `json:"status"`
-	Data   []queryResult `json:"data"`
+	Status string      `json:"status"`
+	Data   queryResult `json:"data"`
 }
 
 type ValueType int
@@ -41,13 +41,15 @@ func main() {
 }
 
 func QueryServer(w http.ResponseWriter, r *http.Request) {
-	data := dataStruct{Status: "success"}
+	res := queryResult{Type: 1}
+	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
 func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
-	data := dataStruct{Status: "query range success"}
+	res := queryResult{Type: 1}
+	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	time.Sleep(11 * time.Second)
 	json.NewEncoder(w).Encode(data)
