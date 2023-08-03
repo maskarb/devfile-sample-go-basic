@@ -17,7 +17,7 @@ func main() {
 }
 
 func HelloServer(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path[1:]
+	path := r.URL.Path[5:]
 	if path != "query_range" {
 		fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
 	} else {
