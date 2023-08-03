@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/prometheus/common/model"
 )
 
 var port = os.Getenv("PORT")
@@ -24,11 +22,8 @@ type Value interface {
 }
 
 type queryResult struct {
-	Type   ValueType   `json:"resultType"`
+	Type   string      `json:"resultType"`
 	Result interface{} `json:"result"`
-
-	// The decoded value.
-	v model.Value
 }
 
 func main() {
@@ -41,14 +36,14 @@ func main() {
 }
 
 func QueryServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: ValueType(model.ValScalar)}
+	res := queryResult{Type: "vector"}
 	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
 func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: ValueType(model.ValScalar)}
+	res := queryResult{Type: "vector"}
 	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	time.Sleep(11 * time.Second)
