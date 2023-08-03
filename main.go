@@ -6,9 +6,30 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/prometheus/common/model"
 )
 
 var port = os.Getenv("PORT")
+
+type dataStruct struct {
+	Status string        `json:"status"`
+	Data   []queryResult `json:"data"`
+}
+
+type ValueType int
+type Value interface {
+	Type() ValueType
+	String() string
+}
+
+type queryResult struct {
+	Type   ValueType   `json:"resultType"`
+	Result interface{} `json:"result"`
+
+	// The decoded value.
+	v model.Value
+}
 
 func main() {
 	if port == "" {
@@ -20,13 +41,13 @@ func main() {
 }
 
 func QueryServer(w http.ResponseWriter, r *http.Request) {
-	data := struct{ Status string }{Status: "query success"}
+	data := dataStruct{Status: "success"}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
 func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
-	data := struct{ Status string }{Status: "query range success"}
+	data := dataStruct{Status: "query range success"}
 	w.Header().Set("Content-Type", "application/json")
 	time.Sleep(11 * time.Second)
 	json.NewEncoder(w).Encode(data)
