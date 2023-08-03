@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -19,10 +20,14 @@ func main() {
 }
 
 func QueryServer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello Query World!")
+	data := struct{ Status string }{Status: "query success"}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(data)
 }
 
 func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
+	data := struct{ Status string }{Status: "query range success"}
+	w.Header().Set("Content-Type", "application/json")
 	time.Sleep(11 * time.Second)
-	fmt.Fprint(w, "Hello QueryRange World!")
+	json.NewEncoder(w).Encode(data)
 }
