@@ -13,8 +13,8 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	http.HandleFunc("/api/prometheus/api/v1/query", QueryServer)
-	http.HandleFunc("/api/prometheus/api/v1/query_range", QueryRangeServer)
+	http.HandleFunc("/api/v1/query", QueryServer)
+	http.HandleFunc("/api/v1/query_range", QueryRangeServer)
 	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), nil)
 }
 
