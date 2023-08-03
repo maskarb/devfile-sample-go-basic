@@ -41,14 +41,14 @@ func main() {
 }
 
 func QueryServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: 1}
+	res := queryResult{Type: ValueType(model.ValScalar)}
 	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
 func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: 1}
+	res := queryResult{Type: ValueType(model.ValScalar)}
 	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	time.Sleep(11 * time.Second)
