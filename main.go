@@ -22,8 +22,8 @@ type Value interface {
 }
 
 type queryResult struct {
-	Type   string      `json:"resultType"`
-	Result interface{} `json:"result"`
+	Type   string `json:"resultType"`
+	Result string `json:"result"`
 }
 
 func main() {
@@ -36,14 +36,14 @@ func main() {
 }
 
 func QueryServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: "vector"}
+	res := queryResult{Type: "vector", Result: "[]"}
 	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
 func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: "vector"}
+	res := queryResult{Type: "vector", Result: "[]"}
 	data := dataStruct{Status: "success", Data: res}
 	w.Header().Set("Content-Type", "application/json")
 	time.Sleep(11 * time.Second)
