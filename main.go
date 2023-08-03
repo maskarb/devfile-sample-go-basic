@@ -19,10 +19,10 @@ func main() {
 }
 
 func QueryServer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello World!")
+	fmt.Fprint(w, "Hello Query World!")
 }
 
 func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(11 * time.Second)
-	fmt.Fprint(w, "Hello World!")
+	fmt.Fprint(w, "Hello QueryRange World!")
 }
