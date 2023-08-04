@@ -18,22 +18,16 @@ func copyHeader(dst, src http.Header) {
 type proxy struct{}
 
 func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
-	log.Println(req.URL.Scheme, " ", req.Method, " ", req.URL)
-
-	if req.URL.Scheme != "http" && req.URL.Scheme != "https" {
-		msg := "unsupported protocal scheme " + req.URL.Scheme
-		http.Error(wr, msg, http.StatusBadRequest)
-		log.Println(msg)
-		return
-	}
-
 	client := &http.Client{}
 
 	//http: Request.RequestURI can't be set in client requests.
 	//http://golang.org/src/pkg/net/http/client.go
 	req.RequestURI = ""
 
+	req.URL.Scheme = "http"
 	req.URL.Host = "thanos-querier.openshift-monitoring.svc:9091"
+
+	log.Println(req.URL.Scheme, " ", req.Method, " ", req.URL)
 
 	resp, err := client.Do(req)
 	if err != nil {
