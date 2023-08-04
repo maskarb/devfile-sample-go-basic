@@ -1,51 +1,61 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"flag"
+	"io"
+	"log"
 	"net/http"
-	"os"
-	"time"
 )
 
-var port = os.Getenv("PORT")
-
-type dataStruct struct {
-	Status string      `json:"status"`
-	Data   queryResult `json:"data"`
+func copyHeader(dst, src http.Header) {
+	for k, vv := range src {
+		for _, v := range vv {
+			dst.Add(k, v)
+		}
+	}
 }
 
-type ValueType int
-type Value interface {
-	Type() ValueType
-	String() string
-}
+type proxy struct{}
 
-type queryResult struct {
-	Type   string      `json:"resultType"`
-	Result interface{} `json:"result"`
+func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
+
+	if req.URL.Scheme != "http" && req.URL.Scheme != "https" {
+		msg := "unsupported protocal scheme " + req.URL.Scheme
+		http.Error(wr, msg, http.StatusBadRequest)
+		log.Println(msg)
+		return
+	}
+
+	client := &http.Client{}
+
+	//http: Request.RequestURI can't be set in client requests.
+	//http://golang.org/src/pkg/net/http/client.go
+	req.RequestURI = ""
+
+	req.URL.Host = "thanos-querier.openshift-monitoring.svc:9091"
+
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(wr, "Server Error", http.StatusInternalServerError)
+		log.Fatal("ServeHTTP:", err)
+	}
+	defer resp.Body.Close()
+
+	log.Println(req.RemoteAddr, " ", resp.Status)
+
+	copyHeader(wr.Header(), resp.Header)
+	wr.WriteHeader(resp.StatusCode)
+	io.Copy(wr, resp.Body)
 }
 
 func main() {
-	if port == "" {
-		port = "8080"
+	var addr = flag.String("addr", "0.0.0.0:8081", "The addr of the application.")
+	flag.Parse()
+
+	handler := &proxy{}
+
+	log.Println("Starting proxy server on", *addr)
+	if err := http.ListenAndServe(*addr, handler); err != nil {
+		log.Fatal("ListenAndServe:", err)
 	}
-	http.HandleFunc("/api/v1/query", QueryServer)
-	http.HandleFunc("/api/v1/query_range", QueryRangeServer)
-	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), nil)
-}
-
-func QueryServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: "vector", Result: []string{}}
-	data := dataStruct{Status: "success", Data: res}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
-}
-
-func QueryRangeServer(w http.ResponseWriter, r *http.Request) {
-	res := queryResult{Type: "vector", Result: []string{}}
-	data := dataStruct{Status: "success", Data: res}
-	w.Header().Set("Content-Type", "application/json")
-	time.Sleep(11 * time.Second)
-	json.NewEncoder(w).Encode(data)
 }
