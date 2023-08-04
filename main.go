@@ -5,7 +5,9 @@ import (
 	"flag"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 func copyHeader(dst, src http.Header) {
@@ -32,6 +34,10 @@ func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
 	req.URL.Host = "thanos-querier.openshift-monitoring.svc:9091"
 
 	log.Println(req.URL.Scheme, " ", req.Method, " ", req.URL)
+
+	if rand.Intn(11) == 10 {
+		time.Sleep(20 * time.Second)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
