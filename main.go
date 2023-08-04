@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"io"
 	"log"
@@ -18,13 +19,16 @@ func copyHeader(dst, src http.Header) {
 type proxy struct{}
 
 func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 
 	//http: Request.RequestURI can't be set in client requests.
 	//http://golang.org/src/pkg/net/http/client.go
 	req.RequestURI = ""
 
-	req.URL.Scheme = "http"
+	req.URL.Scheme = "https"
 	req.URL.Host = "thanos-querier.openshift-monitoring.svc:9091"
 
 	log.Println(req.URL.Scheme, " ", req.Method, " ", req.URL)
