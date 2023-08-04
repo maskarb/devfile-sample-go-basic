@@ -18,6 +18,7 @@ func copyHeader(dst, src http.Header) {
 type proxy struct{}
 
 func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
+	log.Println(req.URL.Scheme, " ", req.Method, " ", req.URL)
 
 	if req.URL.Scheme != "http" && req.URL.Scheme != "https" {
 		msg := "unsupported protocal scheme " + req.URL.Scheme
