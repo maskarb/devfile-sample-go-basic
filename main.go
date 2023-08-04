@@ -22,7 +22,7 @@ type proxy struct{}
 
 func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // dont ever do this in production
 	}
 	client := &http.Client{Transport: tr}
 
@@ -35,9 +35,8 @@ func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
 
 	log.Println(req.URL.Scheme, " ", req.Method, " ", req.URL)
 
-	randomInt := rand.Intn(11)
-	log.Printf("random number: %d\n", randomInt)
-	if randomInt == 10 {
+	if rand.Intn(20) == 10 {
+		log.Println("simulating slow query")
 		time.Sleep(20 * time.Second)
 	}
 
