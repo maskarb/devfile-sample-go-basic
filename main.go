@@ -35,7 +35,9 @@ func (p *proxy) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
 
 	log.Println(req.URL.Scheme, " ", req.Method, " ", req.URL)
 
-	if rand.Intn(11) == 10 {
+	randomInt := rand.Intn(11)
+	log.Printf("random number: %d\n", randomInt)
+	if randomInt == 10 {
 		time.Sleep(20 * time.Second)
 	}
 
